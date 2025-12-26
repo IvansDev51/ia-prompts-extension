@@ -317,12 +317,7 @@ body {
   line-height: 1.5;
 }
 
-.char-counter {
-  font-size: var(--font-size-xs);
-  color: var(--text-muted);
-  text-align: right;
-  margin-top: 4px;
-}
+
 
 .form-actions {
   display: flex;
@@ -332,61 +327,7 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
-/* Note Details */
-.note-details {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
 
-.note-details-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
-  gap: 12px;
-}
-
-.note-details-title {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--text-color);
-  margin: 0;
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.note-details-actions {
-  display: flex;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.note-details-meta {
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.note-date {
-  font-size: var(--font-size-xs);
-  color: var(--text-muted);
-}
-
-.note-details-content {
-  flex: 1;
-  font-size: var(--font-size-base);
-  line-height: 1.6;
-  color: var(--text-color);
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-y: auto;
-  padding: 12px;
-  background-color: var(--bg-secondary);
-  border-radius: var(--radius-sm);
-}
 
 /* Status Messages */
 .status-message {
@@ -467,25 +408,21 @@ body {
 }
 
 /* Scrollbar Styling */
-.notes-list::-webkit-scrollbar,
-.note-details-content::-webkit-scrollbar {
+.notes-list::-webkit-scrollbar {
   width: 6px;
 }
 
-.notes-list::-webkit-scrollbar-track,
-.note-details-content::-webkit-scrollbar-track {
+.notes-list::-webkit-scrollbar-track {
   background: var(--bg-secondary);
   border-radius: 3px;
 }
 
-.notes-list::-webkit-scrollbar-thumb,
-.note-details-content::-webkit-scrollbar-thumb {
+.notes-list::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: 3px;
 }
 
-.notes-list::-webkit-scrollbar-thumb:hover,
-.note-details-content::-webkit-scrollbar-thumb:hover {
+.notes-list::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
 
@@ -506,7 +443,6 @@ body {
 /* Print styles */
 @media print {
   .header-actions,
-  .note-details-actions,
   .form-actions {
     display: none;
   }

@@ -2,7 +2,6 @@
 class NotesManager {
   constructor() {
     this.currentView = 'list';
-    this.currentNote = null;
     this.editingNote = null;
     this.cachedNotes = [];
     this.pendingDelete = null; // For custom confirmation dialog
@@ -27,12 +26,9 @@ class NotesManager {
     // Form events
     document.getElementById('noteForm').addEventListener('submit', (e) => this.handleFormSubmit(e));
     document.getElementById('cancelBtn').addEventListener('click', () => this.showNotesList());
-    document.getElementById('noteContent').addEventListener('input', () => this.updateCharCount());
 
-    // Details view events
-    document.getElementById('copyBtn').addEventListener('click', () => this.copyNoteContent());
-    document.getElementById('editBtn').addEventListener('click', () => this.editCurrentNote());
-    document.getElementById('deleteBtn').addEventListener('click', () => this.deleteCurrentNoteFromDetails());
+
+
 
     // Confirmation dialog events
     document.getElementById('confirmCancel').addEventListener('click', () => this.hideConfirmDialog());
@@ -57,9 +53,13 @@ class NotesManager {
         this.deleteNote(noteId);
       } else if (noteItem && !e.target.closest('.note-actions')) {
         const noteId = noteItem.dataset.noteId;
+        console.log('Note item clicked, ID:', noteId);
         const note = this.getNoteById(noteId);
         if (note) {
-          this.showNoteDetails(note);
+          console.log('Opening note edit form for:', note.title);
+          this.showNoteForm(note);
+        } else {
+          console.log('Note not found for ID:', noteId);
         }
       }
     });
@@ -137,10 +137,14 @@ class NotesManager {
         // Don't trigger if clicking on action buttons
         if (e.target.closest('.note-actions')) return;
         
+        console.log('Direct note item click, ID:', item.dataset.noteId);
+        e.stopPropagation(); // Prevent event delegation from also firing
+        
         const noteId = item.dataset.noteId;
         const note = sortedNotes.find(n => n.id === noteId);
         if (note) {
-          this.showNoteDetails(note);
+          console.log('Direct handler - Opening note edit form for:', note.title);
+          this.showNoteForm(note);
         }
       });
     });
@@ -165,39 +169,33 @@ class NotesManager {
       saveBtn.textContent = 'Save Note';
     }
     
-    this.updateCharCount();
     this.showView('noteFormView');
   }
 
-  showNoteDetails(note) {
-    // Clear any editing state
-    this.editingNote = null;
-    
-    this.currentNote = note;
-    this.currentView = 'details';
-    
-    document.getElementById('detailsTitle').textContent = note.title || 'Untitled';
-    document.getElementById('detailsContent').textContent = note.content || '';
-    document.getElementById('detailsDate').textContent = this.formatDate(note.createdAt);
-    
-    this.showView('noteDetailsView');
-  }
+
 
   showNotesList() {
     this.currentView = 'list';
-    this.currentNote = null;
     this.editingNote = null;
     this.showView('notesListView');
   }
 
   showView(viewId) {
+    console.log('showView called with:', viewId);
+    
     // Hide all views
     document.querySelectorAll('.view').forEach(view => {
       view.classList.add('hidden');
     });
     
     // Show target view
-    document.getElementById(viewId).classList.remove('hidden');
+    const targetView = document.getElementById(viewId);
+    if (targetView) {
+      targetView.classList.remove('hidden');
+      console.log('Successfully showed view:', viewId);
+    } else {
+      console.error('View not found:', viewId);
+    }
   }
 
   async handleFormSubmit(e) {
@@ -292,11 +290,8 @@ class NotesManager {
       
       await chrome.storage.local.set({ notes: filteredNotes });
       
-      // If we're currently viewing the deleted note, go back to list
-      if (this.currentNote && this.currentNote.id === this.pendingDelete) {
-        this.currentNote = null;
-        this.showNotesList();
-      }
+      // Go back to list after deletion
+      this.showNotesList();
       
       this.showStatus('Note deleted successfully', 'success');
       
@@ -342,32 +337,7 @@ class NotesManager {
     }
   }
 
-  async copyNoteContent() {
-    if (this.currentNote) {
-      await this.copyNote(this.currentNote.id);
-    }
-  }
 
-  editCurrentNote() {
-    if (this.currentNote) {
-      this.showNoteForm(this.currentNote);
-    }
-  }
-
-  deleteCurrentNote() {
-    if (this.currentNote) {
-      this.deleteNote(this.currentNote.id);
-    }
-  }
-
-  deleteCurrentNoteFromDetails() {
-    if (this.currentNote) {
-      // Clear current note first to prevent navigation issues
-      const noteId = this.currentNote.id;
-      this.currentNote = null;
-      this.deleteNote(noteId);
-    }
-  }
 
   async exportNotes() {
     try {
@@ -405,20 +375,7 @@ class NotesManager {
     }
   }
 
-  updateCharCount() {
-    const content = document.getElementById('noteContent').value;
-    const charCount = document.getElementById('charCount');
-    charCount.textContent = content.length;
-    
-    // Color coding for character limit
-    if (content.length > 900) {
-      charCount.style.color = '#dc3545'; // Red
-    } else if (content.length > 750) {
-      charCount.style.color = '#ffc107'; // Yellow
-    } else {
-      charCount.style.color = '#6c757d'; // Gray
-    }
-  }
+
 
   showStatus(message, type = 'success') {
     const statusEl = document.getElementById('statusMessage');
