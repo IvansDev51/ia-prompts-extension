@@ -6,6 +6,11 @@ class NotesManager {
     this.editingNote = null;
     this.cachedNotes = [];
     this.pendingDelete = null; // For custom confirmation dialog
+    
+    // Search functionality
+    this.searchQuery = '';
+    this.filteredNotes = [];
+    
     this.init();
   }
 
@@ -33,6 +38,9 @@ class NotesManager {
     document.getElementById('confirmCancel').addEventListener('click', () => this.hideConfirmDialog());
     document.getElementById('confirmDelete').addEventListener('click', () => this.confirmDelete());
 
+    // Inline search events
+    document.getElementById('inlineSearchInput').addEventListener('input', (e) => this.handleInlineSearch(e));
+
     // Event delegation for notes list
     document.getElementById('notesList').addEventListener('click', (e) => {
       const copyBtn = e.target.closest('button[title="Copy"]');
@@ -55,14 +63,16 @@ class NotesManager {
         }
       }
     });
+
+
   }
 
   async loadNotes() {
     try {
       const result = await chrome.storage.local.get(['notes']);
       const notes = result.notes || [];
-      this.displayNotes(notes);
       this.cachedNotes = notes; // Cache for faster access
+      this.filterNotes(); // Apply current search filter
     } catch (error) {
       console.error('Error loading notes:', error);
       this.showStatus('Failed to load notes', 'error');
@@ -82,14 +92,27 @@ class NotesManager {
   displayNotes(notes) {
     const notesList = document.getElementById('notesList');
     const emptyState = document.getElementById('emptyState');
+    const searchEmptyState = document.getElementById('searchEmptyState');
 
     if (notes.length === 0) {
       notesList.innerHTML = '';
-      emptyState.classList.remove('hidden');
+      
+      // Show appropriate empty state
+      if (this.searchQuery.trim()) {
+        // Search query exists but no results
+        emptyState.classList.add('hidden');
+        searchEmptyState.classList.remove('hidden');
+      } else {
+        // No search query, no notes at all
+        searchEmptyState.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+      }
       return;
     }
 
+    // Hide both empty states when showing notes
     emptyState.classList.add('hidden');
+    searchEmptyState.classList.add('hidden');
     
     // Sort notes by creation date (newest first)
     const sortedNotes = notes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -147,6 +170,9 @@ class NotesManager {
   }
 
   showNoteDetails(note) {
+    // Clear any editing state
+    this.editingNote = null;
+    
     this.currentNote = note;
     this.currentView = 'details';
     
@@ -428,6 +454,35 @@ class NotesManager {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // Inline search functionality
+  handleInlineSearch(e) {
+    this.searchQuery = e.target.value;
+    this.filterNotes();
+  }
+
+  filterNotes() {
+    if (!this.cachedNotes) {
+      this.displayNotes([]);
+      return;
+    }
+
+    const lowercaseQuery = this.searchQuery.toLowerCase().trim();
+    
+    if (!lowercaseQuery) {
+      // Show all notes if no search query
+      this.filteredNotes = [...this.cachedNotes];
+    } else {
+      // Filter notes by title and content
+      this.filteredNotes = this.cachedNotes.filter(note => {
+        const title = (note.title || '').toLowerCase();
+        const content = (note.content || '').toLowerCase();
+        return title.includes(lowercaseQuery) || content.includes(lowercaseQuery);
+      });
+    }
+    
+    this.displayNotes(this.filteredNotes);
   }
 }
 

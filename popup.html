@@ -18,6 +18,9 @@
 
     <!-- Notes List View -->
     <div id="notesListView" class="view">
+      <div class="search-container">
+        <input type="search" id="inlineSearchInput" class="search-input-inline" placeholder="Search notes..." autocomplete="off">
+      </div>
       <ul id="notesList" class="notes-list">
         <!-- Notes will be populated here -->
       </ul>
@@ -25,6 +28,11 @@
         <div class="empty-icon">📝</div>
         <p class="empty-text">No notes yet</p>
         <p class="empty-hint">Click "New" to create your first note</p>
+      </div>
+      <div id="searchEmptyState" class="empty-state hidden">
+        <div class="empty-icon">🔍</div>
+        <p class="empty-text">No notes found</p>
+        <p class="empty-hint">Try a different search term</p>
       </div>
     </div>
 
@@ -72,6 +80,8 @@
 
   <!-- Status Messages -->
   <div id="statusMessage" class="status-message hidden"></div>
+
+
 
   <!-- Confirmation Dialog -->
   <div id="confirmDialog" class="confirm-dialog hidden">
