@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        width: 300px;
+        padding: 15px;
+        font-family: sans-serif;
+      }
+      textarea {
+        width: 100%;
+        height: 60px;
+        margin-bottom: 10px;
+        resize: none;
+      }
+      .btn-container {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 15px;
+      }
+      button {
+        cursor: pointer;
+        padding: 8px;
+        flex: 1;
+      }
+      #exportBtn {
+        background-color: #e0e0e0;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        border-top: 1px solid #ccc;
+      }
+      li {
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .delete-btn {
+        color: red;
+        cursor: pointer;
+        font-weight: bold;
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>My Local Notes</h3>
+    <textarea id="noteInput" placeholder="Write a note..."></textarea>
+
+    <div class="btn-container">
+      <button id="saveBtn">Save Note</button>
+      <button id="exportBtn">Export JSON</button>
+    </div>
+
+    <ul id="notesList"></ul>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
